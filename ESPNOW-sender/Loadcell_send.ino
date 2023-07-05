@@ -11,33 +11,29 @@
 
 #include <ESP8266WiFi.h>
 #include <espnow.h>
+
+// sensor libraries
 #include <HX711_ADC.h> // https://github.com/olkal/HX711_ADC
 #include <Wire.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-HX711_ADC LoadCell(4, 5); // parameters: dt pin, sck pin<span data-mce-type="bookmark" style="display: inline-block; width: 0px; overflow: hidden; line-height: 0;" class="mce_SELRES_start"></span>
-
+// constant variables
+// Set your Board ID (ESP32 Sender #1 = BOARD_ID 1, ESP32 Sender #2 = BOARD_ID 2, etc)
+#define BOARD_ID 2
+unsigned long lastTime = 0;
+unsigned long timerDelay = 1;
 // REPLACE WITH RECEIVER MAC Address
 uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xE2, 0xE1, 0x50};
 
-// Set your Board ID (ESP32 Sender #1 = BOARD_ID 1, ESP32 Sender #2 = BOARD_ID 2, etc)
-#define BOARD_ID 2
 
-// Structure example to send data
-// Must match the receiver structure
-typedef struct struct_message {
+HX711_ADC LoadCell(4, 5); // parameters: dt pin, sck pin<span data-mce-type="bookmark" style="display: inline-block; width: 0px; overflow: hidden; line-height: 0;" class="mce_SELRES_start"></span>
+
+// data structure to send data must match with receiver
+struct struct_loadcell {
     int id;
     float x;
-    // float y;
-    // float z;
-} struct_message;
-
-// Create a struct_message called test to store variables to be sent
-struct_message myData;
-
-unsigned long lastTime = 0;
-unsigned long timerDelay = 1;
+} loadcell_data;
 
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
@@ -51,17 +47,23 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
 }
 
 void setup() {
-  // Init Serial Monitor
+  // INIT SERIAL: baud rate 115200
   Serial.begin(115200);
 
-  // Set device as a Wi-Fi Station
+  // INIT WIFI
+  // Set the Wi-Fi mode to WIFI_STA (Wi-Fi Station mode)
   WiFi.mode(WIFI_STA);
+  // Disconnect from any previously connected Wi-Fi networks
   WiFi.disconnect();
+  
+  // INIT LOAD CELL
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
+  /* setCalFactor() set the calibration factor for the load cell to 10000
+   (Need to adjust this value later). */
   LoadCell.setCalFactor(10000);
 
-  // Init ESP-NOW
+  // INIT ESP-NOW
   if (esp_now_init() != 0) {
     Serial.println("Error initializing ESP-NOW");
     return;
@@ -71,9 +73,18 @@ void setup() {
 
   // Once ESPNow is successfully init, we will register for Send CB to
   // get the status of Trasnmitted packet
+  /*
+    OnDataSent callback function is registered using esp_now_register_send_cb().
+    This ensures that the OnDataSent function is called when a data packet is transmitted.
+  */
   esp_now_register_send_cb(OnDataSent);
   
-  // Register peer
+  // add a new peer device to the ESP-NOW network
+  /* esp_now_add_peer() has two mandatory parameters
+    + mac_addr: MAC address of recipient
+    + role: role of the peer being added
+  
+  */
   esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 
 }
@@ -82,11 +93,15 @@ void loop() {
   if ((millis() - lastTime) > timerDelay) {
     LoadCell.update(); // retrieves data from the load cell
     // Set values to send
-    myData.id = BOARD_ID;
-    myData.x = LoadCell.getData();
+    loadcell_data.id = BOARD_ID;
+    loadcell_data.x = LoadCell.getData();
 
     // Send message via ESP-NOW
-    esp_now_send(0, (uint8_t *) &myData, sizeof(myData));
+    /* esp_now_send() takes 3 parameters: 
+      + the recipient's MAC address (in this case, 0 indicates broadcasting to all devices)
+      + a pointer to the data to be sent (&data),
+      + size of the data in bytes (sizeof(data)). */
+    esp_now_send(0, (uint8_t *) &loadcell_data, sizeof(loadcell_data));
     lastTime = millis();
   }
 }

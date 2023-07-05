@@ -1,5 +1,6 @@
+# MPU lib
 MPU6050_light.h
 
+# MQTT lib
 PubSubClient.h
-Arduinojson.h
 WifiClientSecure.h

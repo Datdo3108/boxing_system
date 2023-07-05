@@ -11,64 +11,41 @@
 
 #include <ESP8266WiFi.h>
 #include <espnow.h>
+#include <stdlib.h>
 
 // Structure example to receive data
 // Must match the sender structure
-typedef struct struct_message {
+struct struct_loadcell {
     int id;
     float x;
-    float y;
-    float z;
-} struct_message;
+} loadcell_data;
 
-// Create a struct_message called myData
-struct_message myData;
-
-// Create a structure to hold the readings from each board
-struct_message board1;
-struct_message board2;
-
-// Create an array with all the structures
-struct_message boardsStruct[2] = {board1, board2};
 
 // Callback function that will be executed when data is received
 void OnDataRecv(uint8_t * mac_addr, uint8_t *incomingData, uint8_t len) {
-  // char macStr[18];
-  // Serial.print("Packet received from: ");
-  // snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
-  //          mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-  // Serial.println(macStr);
 
-  memcpy(&myData, incomingData, sizeof(myData));
+  // memory copy from buffer and free memory after that
+  /*
+    copies the data from the incomingData buffer into loadcell_data.
+    Assume -  has a compatible data structure with the incomingData buffer.
+  */
+  memcpy(&loadcell_data, incomingData, sizeof(loadcell_data));
+  free(incomingData);
 
-  // Serial.printf("Board ID %u: %u bytes\n", myData.id, len);
-  // Update the structures with the new incoming data
-
-  boardsStruct[myData.id-1].x = myData.x;
-  boardsStruct[myData.id-1].y = myData.y;
-  boardsStruct[myData.id-1].z = myData.z;
-
-  if(myData.id == 1){
-    Serial.printf("********MPU: %4.2f %4.2f %4.2f", boardsStruct[myData.id-1].x, boardsStruct[myData.id-1].y, boardsStruct[myData.id-1].z);
-  }
-  if(myData.id == 2){
-    Serial.printf("--------Loadcell: %4.2f", boardsStruct[myData.id-1].x = myData.x);
-  }
-  // Serial.printf("x value: %d \n", boardsStruct[myData.id-1].x);
-  // Serial.printf("y value: %d \n", boardsStruct[myData.id-1].y);
-  
+  Serial.printf("--------Loadcell: %4.2f", loadcell_data.x);
   Serial.println();
 }
 
 void setup() {
-  // Initialize Serial Monitor at baud rate 115200
+  // INIT SERIAL: baud rate 115200
   Serial.begin(115200);
   
-  // Set device as a Wi-Fi Station
+  // INIT WIFI
+  // Set the Wi-Fi mode to WIFI_STA (Wi-Fi Station mode)
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
-  // Init ESP-NOW
+  // INIT ESP-NOW
   if (esp_now_init() != 0) {
     Serial.println("Error initializing ESP-NOW");
     return;
@@ -81,15 +58,5 @@ void setup() {
 }
 
 void loop(){
-  // Access the variables for each board
-  // int board1X = boardsStruct[0].x;
-  // int board1Y = boardsStruct[0].y;
-  // int board2X = boardsStruct[1].x;
-  // int board2Y = boardsStruct[1].y;
-  // Serial.print("1X: ");
-  // Serial.println(board1X);
-  // Serial.print("2X: ");
-  // Serial.println(board2X);
-  // delay(300);
 
 }

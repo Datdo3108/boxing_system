@@ -11,31 +11,32 @@
 
 #include <ESP8266WiFi.h>
 #include <espnow.h>
+
+// sensor libraries
 #include <Wire.h>
 #include <MPU6050_light.h>
 
-MPU6050 mpu(Wire);
 
+// constant variables
+// Set your Board ID (ESP32 Sender #1 = BOARD_ID 1, ESP32 Sender #2 = BOARD_ID 2, etc)
+#define BOARD_ID 1 // 1 for MPU6050
+unsigned long lastTime = 0;
+unsigned long timerDelay = 1;
 // REPLACE WITH RECEIVER MAC Address
 uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xE2, 0xE1, 0x50};
 
-// Set your Board ID (ESP32 Sender #1 = BOARD_ID 1, ESP32 Sender #2 = BOARD_ID 2, etc)
-#define BOARD_ID 1
+
+MPU6050 mpu(Wire);
 
 // Structure example to send data
 // Must match the receiver structure
-typedef struct struct_message {
+struct struct_mpu {
     int id;
     float x;
     float y;
     float z;
-} struct_message;
+} mpu_data;
 
-// Create a struct_message called test to store variables to be sent
-struct_message myData;
-
-unsigned long lastTime = 0;
-unsigned long timerDelay = 1;
 
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
@@ -49,16 +50,20 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
 }
 
 void setup() {
-  // Init Serial Monitor at baud rate 115200
+  // INIT SERIAL: baud rate 115200
   Serial.begin(115200);
+
+  // INIT WIFI
+  // Set the Wi-Fi mode to WIFI_STA (Wi-Fi Station mode)
+  WiFi.mode(WIFI_STA);
+  // Disconnect from any previously connected Wi-Fi networks
+  WiFi.disconnect();
+
+  // INIT MPU6050
   Wire.begin();
   mpu.begin();
 
-  // Set device as a Wi-Fi Station
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-
-  // Init ESP-NOW
+  // INIT ESP-NOW
   if (esp_now_init() != 0) {
     Serial.println("Error initializing ESP-NOW");
     return;
@@ -71,6 +76,10 @@ void setup() {
   esp_now_register_send_cb(OnDataSent);
   
   // Register peer
+  /*
+    OnDataSent callback function is registered using esp_now_register_send_cb().
+    This ensures that the OnDataSent function is called when a data packet is transmitted.
+  */
   esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 
 }
@@ -79,13 +88,17 @@ void loop() {
   mpu.update();
   if ((millis() - lastTime) > timerDelay) {
     // Set values to send
-    myData.id = BOARD_ID;
-    myData.x = mpu.getAngleX();
-    myData.y = mpu.getAngleY();
-    myData.z = mpu.getAngleZ();
+    mpu_data.id = BOARD_ID;
+    mpu_data.x = mpu.getAngleX();
+    mpu_data.y = mpu.getAngleY();
+    mpu_data.z = mpu.getAngleZ();
 
     // Send message via ESP-NOW
-    esp_now_send(0, (uint8_t *) &myData, sizeof(myData));
+    /* esp_now_send() takes 3 parameters: 
+      + the recipient's MAC address (in this case, 0 indicates broadcasting to all devices)
+      + a pointer to the data to be sent (&data),
+      + size of the data in bytes (sizeof(data)). */
+    esp_now_send(0, (uint8_t *) &mpu_data, sizeof(mpu_data));
     lastTime = millis();
   }
 }
