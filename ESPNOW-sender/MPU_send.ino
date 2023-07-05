@@ -47,13 +47,13 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
     Serial.println("Delivery fail");
   }
 }
- 
+
 void setup() {
-  // Init Serial Monitor
+  // Init Serial Monitor at baud rate 115200
   Serial.begin(115200);
   Wire.begin();
   mpu.begin();
- 
+
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -74,7 +74,7 @@ void setup() {
   esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 
 }
- 
+
 void loop() {
   mpu.update();
   if ((millis() - lastTime) > timerDelay) {

@@ -38,12 +38,16 @@ void OnDataRecv(uint8_t * mac_addr, uint8_t *incomingData, uint8_t len) {
   // snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
   //          mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
   // Serial.println(macStr);
+
   memcpy(&myData, incomingData, sizeof(myData));
+
   // Serial.printf("Board ID %u: %u bytes\n", myData.id, len);
   // Update the structures with the new incoming data
+
   boardsStruct[myData.id-1].x = myData.x;
   boardsStruct[myData.id-1].y = myData.y;
   boardsStruct[myData.id-1].z = myData.z;
+
   if(myData.id == 1){
     Serial.printf("********MPU: %4.2f %4.2f %4.2f", boardsStruct[myData.id-1].x, boardsStruct[myData.id-1].y, boardsStruct[myData.id-1].z);
   }
@@ -52,11 +56,12 @@ void OnDataRecv(uint8_t * mac_addr, uint8_t *incomingData, uint8_t len) {
   }
   // Serial.printf("x value: %d \n", boardsStruct[myData.id-1].x);
   // Serial.printf("y value: %d \n", boardsStruct[myData.id-1].y);
+  
   Serial.println();
 }
- 
+
 void setup() {
-  // Initialize Serial Monitor
+  // Initialize Serial Monitor at baud rate 115200
   Serial.begin(115200);
   
   // Set device as a Wi-Fi Station

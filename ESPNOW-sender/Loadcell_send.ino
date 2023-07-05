@@ -49,11 +49,11 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
     Serial.println("Delivery fail");
   }
 }
- 
+
 void setup() {
   // Init Serial Monitor
   Serial.begin(115200);
- 
+
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -77,7 +77,7 @@ void setup() {
   esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 
 }
- 
+
 void loop() {
   if ((millis() - lastTime) > timerDelay) {
     LoadCell.update(); // retrieves data from the load cell
