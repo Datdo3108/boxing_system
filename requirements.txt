@@ -7,6 +7,7 @@ Wire.h
 
 # Loadcell
 HX711_ADC.h
+Wire.h
 
 # MQTT
 PubSubClient.h
