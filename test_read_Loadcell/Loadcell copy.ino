@@ -7,7 +7,7 @@ HX711_ADC LoadCell(4, 5); // parameters: dt pin, sck pin<span data-mce-type="boo
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(115200);
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell.setCalFactor(10000);

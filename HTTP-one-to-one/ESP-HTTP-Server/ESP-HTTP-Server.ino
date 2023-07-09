@@ -1,6 +1,8 @@
 // Setup the server to receive data over WiFi
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <stdio.h>
+
 
 // Configuration parameters for Access Point
 // char * ssid_ap = "ANY_SSID";
@@ -37,7 +39,7 @@ void loop() {
 }
 
 void handleIndex() {
-  server.send(200,"text/plain",sensor_value); // we'll need to refresh the page for getting the latest value
+  server.send(200,"text/plain", sensor_value); // we'll need to refresh the page for getting the latest value
 }
 
 void handleUpdate() {

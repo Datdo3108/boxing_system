@@ -1,16 +1,12 @@
 # Wifi
 ESP8266WiFi.h
 
-# ESP now
-espnow.h
-
-# MPU lib
+# MPU
 MPU6050_light.h
 Wire.h
 
 # Loadcell
 HX711_ADC.h
 
-# MQTT lib
+# MQTT
 PubSubClient.h
-WifiClientSecure.h

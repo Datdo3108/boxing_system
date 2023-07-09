@@ -24,7 +24,7 @@ void setup() {
   mpu.begin();
   
   // Connect to the server
-  WiFi.begin(ssid,password);
+  WiFi.begin(ssid, password);
   Serial.begin(115200);
   while(WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
