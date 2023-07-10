@@ -5,6 +5,9 @@
 const char* ssid = "LAPTOP-IO4BI4LC 0162";
 const char* password = "lam123456";
 
+const char* serverIP = "192.168.137.1";
+const int serverPort = 1234;
+
 MPU6050 mpu(Wire);
 
 void setup() {
@@ -12,7 +15,7 @@ void setup() {
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println(".");
+    Serial.print(".");
     }
     Serial.println("Connected");
 
@@ -22,20 +25,34 @@ void setup() {
 
 void loop() {
     if (WiFi.status() == WL_CONNECTED) {
-    WiFiClient client;
-    const char* serverIP = "192.168.137.1";
-    const int serverPort = 1234;
+        WiFiClient client;
 
-    if (!client.connect(serverIP, serverPort)) {
-        Serial.println("Connection failed.");
-        delay(5000);
-        return;
-    }
+        if (!client.connect(serverIP, serverPort)) {
+            Serial.println("Connection failed.");
+            delay(2000);
+            return;
+        }
 
-    String message = "Hello, server!";
-    client.print(message);
-    Serial.println("Message sent to server");
+        while (1) {
+            mpu.update();
 
-    delay(1000);
+            float x, y, z;
+
+            // Set values to send
+            x = mpu.getAngleX();
+            y = mpu.getAngleY();
+            z = mpu.getAngleZ();
+
+            Serial.printf("%f,", x);
+            Serial.printf("%f,", y);
+            Serial.printf("%f\n", z);
+
+            String message = String(x) + "," + String(y) + "," + String(z);
+            client.print(message);
+            Serial.println("Message sent to server");
+            delay(1000);
+        }
+        
+
     }
 }
