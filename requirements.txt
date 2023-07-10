@@ -1,0 +1,13 @@
+# Wifi
+ESP8266WiFi.h
+
+# MPU
+MPU6050_light.h
+Wire.h
+
+# Loadcell
+HX711_ADC.h
+Wire.h
+
+# MQTT
+PubSubClient.h
