@@ -4,7 +4,7 @@ import numpy as np
 
 HOST = '0.0.0.0'  # Listen on all available network interfaces
 PORT = 1234
-RATE_SIZE = 4
+RATE_SIZE = 4 * 4
 
 plt.ion()  # Enable interactive mode for real-time plotting
 
@@ -28,7 +28,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
     # with conn:
     print("Connected by", addr)
     while True:
-        data = conn.recv(1024)
+        data = conn.recv(RATE_SIZE)
         if not data:
             break
 
@@ -46,4 +46,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         ax.autoscale_view()
 
         plt.draw()
-        plt.pause(0.5)  # Pause for a short time to update the plot
+        plt.pause(0.001)  # Pause for a short time to update the plot

@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include <MPU6050_light.h>
 
-const int rate = 500 // rate in milliseconds
+const int rate = 100; // rate in milliseconds
 
 const char* ssid = "LAPTOP-IO4BI4LC 0162";
 const char* password = "lam123456";
