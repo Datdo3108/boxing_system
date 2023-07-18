@@ -13,12 +13,10 @@ void setup() {
 void loop() {
   mpu.update();
 
-  float x, y, z;
-
   // Set values to send
-  x = mpu.getAngleX();
-  y = mpu.getAngleY();
-  z = mpu.getAngleZ();
+  float x = mpu.getAngleX();
+  float y = mpu.getAngleY();
+  float z = mpu.getAngleZ();
 
   Serial.printf("%f,", x);
   Serial.printf("%f,", y);
