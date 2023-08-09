@@ -1,6 +1,7 @@
 import socket
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 localIP = "0.0.0.0"  # Listen on all available network interfaces
 localPort = 1234    # Replace with the same port number used on the ESP8266
@@ -8,13 +9,14 @@ bufferSize = 1024
 
 ## Set up plotting
 plt.ion()  # Enable interactive mode for real-time plotting
-x_data = []
+t_data = []
 y_data = []
 fig, ax = plt.subplots()
-line, = ax.plot(x_data, y_data)
+line, = ax.plot(t_data, y_data)
 ax.set_xlabel("Time")
 ax.set_ylabel("Data Unit")
 ax.set_title("Real-time Flow Data")
+cTime_0 = time.time()
 
 
 # Create a UDP socket
@@ -37,12 +39,14 @@ try:
         print("Received data:", dataReceived)
         print("Data type: ", type(dataReceived))
 
+        cTime = time.time() - cTime_0
+
         # Real-time plotting
         y_data.append(dataReceived)
-        x_data.append(len(y_data))
+        t_data.append(len(y_data))
 
         # Update the line chart
-        line.set_xdata(x_data)
+        line.set_xdata(t_data)
         line.set_ydata(y_data)
         ax.relim()
         ax.autoscale_view()

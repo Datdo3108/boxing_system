@@ -4,8 +4,8 @@
 #include <Wire.h>
 
 
-const char* ssid = "LAPTOP-IO4BI4LC 0162";
-const char* password = "lam123456";
+const char* ssid = "TUANHAI 6318";
+const char* password = "12345678";
 const IPAddress laptopIP(192, 168, 137, 1);  // Replace with your laptop's IP address
 const unsigned int laptopPort = 1234;        // Replace with the desired port number
 
