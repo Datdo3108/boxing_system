@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <Wire.h>
 #include <MPU6050_light.h>
 
 const char* ssid = "LAPTOP-IO4BI4LC 0162";
@@ -16,13 +17,12 @@ void setup() {
     Serial.begin(115200);
     Wire.begin();
     mpu.begin();
-
     WiFi.begin(ssid, password);
 
-    Serial.println("Connecting to WiFi");
+    Serial.println("Connecting to WiFi...");
     while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
+        delay(1000);
+        Serial.print(".");
     }
 
     Serial.println("Connected to WiFi");
@@ -32,11 +32,13 @@ void setup() {
 
 void loop() {
     mpu.update();
-    // Read your sensor data or prepare the data you want to send
-    float  x = mpu.getAngleX();
 
-    // Convert the sensor value to a string
-    String dataToSend = String(x);
+    // Read your sensor data or prepare the data you want to send
+    // Set values to send
+    float x = mpu.getAngleX();
+    float y = mpu.getAngleY();
+    float z = mpu.getAngleZ();
+    String dataToSend =  String(x) +";"+ String(y) + ";" + String(z);
 
     // Send the data to the laptop
     udp.beginPacket(laptopIP, laptopPort);

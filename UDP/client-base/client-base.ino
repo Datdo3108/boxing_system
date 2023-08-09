@@ -14,9 +14,10 @@ void setup() {
     Serial.begin(115200);
     WiFi.begin(ssid, password);
 
-    while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
     Serial.println("Connecting to WiFi...");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.print(".");
     }
 
     Serial.println("Connected to WiFi");
@@ -29,7 +30,10 @@ void loop() {
     // int sensorValue = analogRead(A0);
 
     // Convert the sensor value to a string
-    String dataToSend = "Hello, world!";
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    String dataToSend =  String(x) +";"+ String(y) + ";" + String(z);
 
     // Send the data to the laptop
     udp.beginPacket(laptopIP, laptopPort);
